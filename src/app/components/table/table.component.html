@@ -1,17 +1,55 @@
-<div class="device-table" *ngIf="deviceTable">
-  <table class="device-table__table">
-    <caption class="device-table__caption">{{ deviceTable.title }}</caption>
-    <thead>
-      <th *ngFor="let header of deviceTable.headers" class="device-table__th">
-        {{ header | titlecase }}
-      </th>
-    </thead>
-    <tbody>
-      <tr *ngFor="let row of deviceTable.rows">
-        <td *ngFor="let column of deviceTable.headers">
-          {{ row[column] }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div class="container">
+  <div class="device-table row justify-content-between">
+    <!-- filter -->
+    <mat-form-field class="search-bar col-md-4">
+      <mat-label>Filter</mat-label>
+      <input matInput type="text" [(ngModel)]="query" (keyup)=filterByQuery(query) placeholder="Model e.g. iphone">
+    </mat-form-field>
+    <!-- selector for category -->
+    <mat-form-field  class="col-md-3" appearance="">
+      <mat-label>Select a category</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let category of uniqueCategory" [value]="category">
+          <div (click)="filterByQuery(category)">
+            {{category}}
+          </div>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 </div>
+<!-- table -->
+<div [hidden]="!devices || devices.length == 0"> 
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 device-table">
+    <ng-container matColumnDef="model">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Model </th>
+      <td mat-cell *matCellDef="let device"> {{device.model}} </td>
+    </ng-container>
+    <ng-container matColumnDef="person">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Person </th>
+      <td mat-cell *matCellDef="let device"> {{device.person}} </td>
+    </ng-container>
+    <ng-container matColumnDef="group">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Group </th>
+      <td mat-cell *matCellDef="let device"> {{device.group}} </td>
+    </ng-container>
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+      <td mat-cell *matCellDef="let device"> {{device.category}} </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <mat-paginator class="device-table" [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+</div>
+<!-- template when no filter resullt -->
+<div *ngIf="!devices || devices.length == 0">
+  <mat-card class="device-table">No Result Found</mat-card>
+</div>
+<!-- toaster -->
+<go-toaster
+  header="Heads up!"
+  message="We found something"
+  type="positive">
+</go-toaster>
+
